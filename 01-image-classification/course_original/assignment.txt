@@ -1,0 +1,83 @@
+实训题（满分100分，共1题）
+1. 手写数字识别与垃圾分类（代码+实验报告）（100分）
+手写数字识别与26种垃圾分类
+1. 实验介绍
+1.1 实验背景
+LeNet5 + MNIST 被誉为深度学习领域的 “Hello world”。本实验主要介绍使用 MindSpore 在 MNIST 手写数字数据集上开发和训练一个 LeNet5 模型，并验证模型精度。
+
+通过以上学习，使用MindSpore 深度学习框架实现26种垃圾进行分类。
+
+MindSpore 是最佳匹配 Ascend（昇腾）芯片的开源 AI 计算框架，同时也支持 CPU、GPU 平台。访问MindSpore 官网了解更多：https://www.mindspore.cn/
+
+深度学习计算中，从头开始训练一个实用的模型通常非常耗时，需要大量计算能力。常用的数据如 OpenImage、ImageNet、VOC、COCO 等公开大型数据集，规模达到几十万甚至超过上百万张。网络和开源社区上通常会提供这些数据集上预训练好的模型。大部分细分领域任务在训练网络模型时，如果不使用预训练模型而从头开始训练网络，不仅耗时，且模型容易陷入局部极小值和过拟合。因此大部分任务都会选择预训练模型，在其上做微调（也称为 Fine-Tune）。
+
+本实验以 MobileNetV2+ 垃圾分类数据集为例，主要介绍如在使用 MindSpore 在 CPU/GPU 平台上进行 Fine-Tune。
+
+1.2 实验目的
+了解如何使用MindSpore进行简单卷积神经网络的开发。
+了解如何使用MindSpore进行简单图片分类任务的训练。
+了解如何使用MindSpore进行简单图片分类任务的验证。
+1.3 预备知识
+熟练使用Python，了解Shell及Linux操作系统基本知识。
+具备一定的深度学习理论知识，如卷积神经网络、损失函数、优化器，训练策略等。
+了解并熟悉MindSpore AI计算框架，MindSpore官网：https://www.mindspore.cn
+学习更多MindSpore实验案例，请前往：https://gitee.com/mindspore/course
+1.4 实验环境
+MindSpore 深度学习框架
+1.5 实验准备
+1.5.1 MNIST是一个手写数字数据集
+MNIST是一个手写数字数据集，训练集包含60000张手写数字，测试集包含10000张手写数字，共10类。MNIST数据集的官网：THE MNIST DATABASE。
+
+train-images-idx3-ubyte.gz:  training set images (9912422 bytes)
+train-labels-idx1-ubyte.gz:  training set labels (28881 bytes)
+t10k-images-idx3-ubyte.gz:   test set images (1648877 bytes)
+t10k-labels-idx1-ubyte.gz:   test set labels (4542 bytes)
+1.5.2 MNIST是一个手写数字数据集 脚本准备
+将脚本和数据集组织为如下形式：
+
+lenet5
+├── ./datasets/5fbdf571c06d3433df85ac65-momodel/MNIST
+│   ├── test
+│   │   ├── t10k-images-idx3-ubyte
+│   │   └── t10k-labels-idx1-ubyte
+│   └── train
+│       ├── train-images-idx3-ubyte
+│       └── train-labels-idx1-ubyte
+└── lenet_mnist.ipynb # 或lenet_mnist.py
+1.5.3 垃圾分类脚本准备
+脚本、预训练模型的 Checkpoint 和数据集组织为如下形式：
+
+├── main.ipynb # 入口Jupyter Notebook文件
+│
+├── src_mindspore
+│   ├── dataset.py
+│   ├── mobilenetv2.py
+│   └── mobilenetv2-200_1067_gpu_cpu.ckpt
+│
+├── results/mobilenetv2.mindir # 待生成的MindSpore0.5.0模型文件
+│
+├── train_main.py # 将 main.ipynb Notebook 训练模型代码转化为py文件
+│
+└── datasets/5fbdf571c06d3433df85ac65-momodel/garbage_26x100/ # 数据集
+    ├── train/
+    ├── val/
+    └── label.txt
+1.5.4 26种垃圾数据集信息
+垃圾分类信息：
+
+{
+    '干垃圾': ['贝壳', '打火机', '旧镜子', '扫把', '陶瓷碗', '牙刷', '一次性筷子', '脏污衣服'],
+    '可回收物': ['报纸', '玻璃制品', '篮球', '塑料瓶', '硬纸板', '玻璃瓶', '金属制品', '帽子', '易拉罐', '纸张'],
+    '湿垃圾': ['菜叶', '橙皮', '蛋壳', '香蕉皮'],
+    '有害垃圾': ['电池', '药片胶囊', '荧光灯', '油漆桶']
+}
+
+['贝壳', '打火机', '旧镜子', '扫把', '陶瓷碗', '牙刷', '一次性筷子', '脏污衣服',
+'报纸', '玻璃制品', '篮球', '塑料瓶', '硬纸板', '玻璃瓶', '金属制品', '帽子', '易拉罐', '纸张',
+'菜叶', '橙皮', '蛋壳', '香蕉皮',
+'电池', '药片胶囊', '荧光灯', '油漆桶']
+
+['Seashell', 'Lighter', 'Old Mirror', 'Broom', 'Ceramic Bowl', 'Toothbrush', 'Disposable Chopsticks', 'Dirty Cloth',
+'Newspaper', 'Glassware', 'Basketball', 'Plastic Bottle', 'Cardboard', 'Glass Bottle', 'Metalware', 'Hats', 'Cans', 'Paper',
+'Vegetable Leaf', 'Orange Peel', 'Eggshell', 'Banana Peel',
+'Battery', 'Tablet capsules', 'Fluorescent lamp', 'Paint bucket']

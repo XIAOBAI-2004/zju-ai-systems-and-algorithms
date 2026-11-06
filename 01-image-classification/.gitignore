@@ -1,0 +1,12 @@
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+/results/retrained.ckpt
+/course_original/results/
+/course_original/datasets/*/MNIST/
+/course_original/datasets/*/garbage_26x100/train/
+/course_original/datasets/*/garbage_26x100/val/
+/course_original/src_mindspore/mobilenetv2-200_1067_cpu_gpu.ckpt
+
