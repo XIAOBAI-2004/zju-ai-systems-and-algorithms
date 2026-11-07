@@ -1,0 +1,118 @@
+% !TeX program = lualatex
+% !TeX encoding = UTF-8
+\documentclass[UTF8,a4paper,zihao=-4,fontset=fandol]{ctexart}
+\usepackage[margin=23mm,top=18mm,bottom=17mm,includeheadfoot,
+            headheight=16pt,headsep=12pt,footskip=22pt]{geometry}
+\usepackage{amsmath,booktabs,caption,enumitem,fancyhdr,float,pgfplots,pgfplotstable,etoolbox}
+\pgfplotsset{compat=1.18}
+\usepackage{url}
+
+% ---------- 基本信息：复用模板时先修改这里 ----------
+\newcommand*{\ReportTitle}{金融异常检测实验报告}
+\newcommand*{\CourseName}{人工智能算法与系统}
+\newcommand*{\ReportType}{课程实验报告}
+\newcommand*{\Institution}{浙江大学}
+\newcommand*{\Semester}{2026 年秋季学期}
+\newcommand*{\ReportByline}{} % 可填写：姓名：张某 \quad 学号：……；留空则不显示。
+
+% ---------- 公共版式：标题、页眉页脚、图表 ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small \CourseName\quad\ReportType}
+\fancyhead[R]{\small \Institution\quad\Semester}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.18em}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{9pt plus 2pt minus 2pt}
+\ctexset{
+  section = {name={},number=\arabic{section},format=\raggedright\zihao{4}\bfseries,
+             aftername=\hspace{0.65em},beforeskip=11pt,afterskip=5pt},
+  subsection = {format=\raggedright\zihao{-4}\bfseries,
+                aftername=\hspace{0.6em},beforeskip=7pt,afterskip=3pt}
+}
+\captionsetup{font=small,labelfont=bf,labelsep=quad,skip=5pt}
+\setlist[enumerate]{label=\arabic*.,leftmargin=2.3em,topsep=3pt,itemsep=0pt,parsep=0pt}
+\newcommand*{\code}[1]{\texttt{\detokenize{#1}}}
+\raggedbottom
+
+\nofiles
+\begin{document}
+
+\begin{center}
+  {\zihao{3}\bfseries \ReportTitle\par}
+  \ifdefempty{\ReportByline}{}{\medskip{\zihao{5}\ReportByline\par}}
+\end{center}
+
+
+\section{实验任务与评价指标}
+在 DGraph-Fin 联系人图上，对正常用户与欺诈用户进行二分类。图中的有向边表示用户将另一人列为紧急联系人，每条边带有关系类型与脱敏时间。训练集有 857,899 个节点，验证集有 183,862 个节点，其中 2,326 个是欺诈用户。用 ROC-AUC 衡量欺诈节点的风险分数排在正常节点之前的能力。
+
+\section{原始 MLP}
+只使用用户自身的 20 维属性。按原始示例标准化后，经过 128 单元的 ReLU 隐藏层，输出两类得分。在训练集上优化负对数似然，训练 200 轮，完整验证 AUC 为 0.71151。此方案作为后续对比的基准。
+
+\section{固定 50 个特征}
+在 20 维属性之外，按主动联系与被联系两个方向各加入 15 列。每个方向包含总联系数、11 类关系的联系数，以及首次、最近和平均联系时间。用 $\log(1+n)$ 变换联系次数，无联系时的时间统计置零，标准化参数仅在训练节点上拟合。
+
+分别训练线性模型与单隐藏层 MLP。MLP 使用 64 个隐藏单元和 0.003 的学习率，按验证 AUC 选择第 58 轮的权重，完整验证 AUC 为 0.80306。
+
+\section{固定特征下的模型对比}
+分箱 FM 按训练数据确定数值区间，再学习特征对的交互。CatBoost 和 LightGBM 用多棵浅树逐步修正预测，学习联系次数与时间等变量的条件组合。表中的五个改进模型采用同一套 50 维输入。
+
+\begin{table}[H]
+  \centering
+  \caption{原始 MLP 与固定特征方案的 AUC 对比}
+  \small
+  \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcc@{}}
+    \toprule
+    模型 & 特征数 & 完整验证 AUC\\
+    \midrule
+    原始 MLP & 20 & 0.71151\\
+    线性模型 & 50 & 0.79307\\
+    单隐藏层 MLP & 50 & 0.80306\\
+    分箱 FM & 50 & 0.80646\\
+    CatBoost & 50 & 0.81043\\
+    LightGBM & 50 & \textbf{0.81241}\\
+    \bottomrule
+  \end{tabular*}
+\end{table}
+
+固定输入下，最大深度为 4、包含 772 棵树的 LightGBM 表现最好，AUC 比该 MLP 高 0.00935。
+
+\clearpage
+\section{丰富图特征与五模型组合}
+\subsection{特征构造}
+在个人属性和基础联系统计上增加三类信息。
+\begin{enumerate}
+  \item \textbf{图结构}　统计邻居属性、双向联系和两跳关系，例如比较共享同一紧急联系人的用户。
+  \item \textbf{联系时间}　统计联系时间跨度、间隔及共同联系人在相近时段的活动。
+  \item \textbf{已知风险}　统计已标注邻居及相似活动群体的欺诈率。将训练节点分为五折，计算每个训练节点的标签统计时排除其所在折。验证和测试节点的风险统计仅使用训练标签。
+\end{enumerate}
+
+\subsection{成员训练与融合}
+训练 4 个 LightGBM 和 1 个 CatBoost。各成员保留训练集的欺诈样本，按配置抽取正常样本，并使用不同的特征组合和树深。融合时先把各模型的欺诈概率转换为对数几率，按表中权重加权求和，再用 Sigmoid 转回概率。以固定的一半验证节点选择树的停止轮数与融合方案，另一半用于复核。
+
+\begin{table}[H]
+  \centering
+  \caption{五模型组合的成员配置与验证表现}
+  \small
+  \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lccccc@{}}
+    \toprule
+    成员 & 特征数 & 最大树深 & 树数 & 权重 & 单模型 AUC\\
+    \midrule
+    LightGBM 1 & 241 & 7 & 455 & 18.75\% & 0.83836\\
+    LightGBM 2 & 241 & 8 & 466 & 18.75\% & 0.83814\\
+    LightGBM 3 & 281 & 8 & 418 & 18.75\% & 0.83812\\
+    LightGBM 4 & 271 & 9 & 417 & 18.75\% & 0.83758\\
+    CatBoost & 261 & 8 & 722 & 25.00\% & 0.83607\\
+    \bottomrule
+  \end{tabular*}
+\end{table}
+
+\section{最终方案与选择依据}
+选择五模型组合。完整验证 AUC 为 \textbf{0.84027}，比固定 50 个特征的 LightGBM 高 0.02786，比组合中最好的单模型高 0.00191。用于选择方案的半区与复核半区 AUC 分别为 0.83865 和 0.84194。
+
+按作业说明的固定图推理方式，将融合预测预先保存至 \allowbreak\path{results/optimized_model.pt}。\code{main.py} 按节点编号查找结果，返回正常和欺诈两类概率。Mo 第 3 次系统测试的 AUC 为 \textbf{0.858}，耗时 4 秒。
+
+\end{document}

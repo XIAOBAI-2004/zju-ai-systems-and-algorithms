@@ -1,0 +1,6 @@
+datasets/
+/results/*
+!/results/optimized_recipe.json
+*.log
+*.synctex.gz
+*.aux
