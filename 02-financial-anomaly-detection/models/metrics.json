@@ -1,0 +1,91 @@
+{
+  "mlp20": {
+    "valid_auc": 0.7115059083951086,
+    "seed": 42,
+    "best_epoch": 200
+  },
+  "linear50": {
+    "hidden": 0,
+    "lr": 0.003,
+    "epochs": 100,
+    "seed": 42,
+    "best_epoch": 78,
+    "tuning_auc": 0.7910236631361933,
+    "other_half_auc": 0.7951425375725689,
+    "valid_auc": 0.7930709014991438
+  },
+  "mlp50": {
+    "hidden": 64,
+    "lr": 0.003,
+    "epochs": 100,
+    "seed": 42,
+    "best_epoch": 58,
+    "tuning_auc": 0.8029349228420394,
+    "other_half_auc": 0.8031986843064529,
+    "valid_auc": 0.8030617769638324
+  },
+  "fm50": {
+    "rank": 4,
+    "bins": 16,
+    "lr": 0.003,
+    "epochs": 30,
+    "seed": 42,
+    "best_epoch": 27,
+    "tuning_auc": 0.8034435471366609,
+    "other_half_auc": 0.8095164977214026,
+    "valid_auc": 0.8064613215436928
+  },
+  "catboost50": {
+    "depth": 3,
+    "seed": 42,
+    "trees": 1237,
+    "features": 50,
+    "tuning_auc": 0.8079625989682161,
+    "other_half_auc": 0.8129334370967819,
+    "valid_auc": 0.8104287298211846
+  },
+  "lightgbm50": {
+    "engine": "lightgbm",
+    "depth": 4,
+    "seed": 42,
+    "tree_limit": 1400,
+    "trees": 772,
+    "features": 50,
+    "tuning_auc": 0.809152834003188,
+    "other_half_auc": 0.8157314106781772,
+    "valid_auc": 0.8124074677398891
+  },
+  "ensemble": {
+    "validation_nodes": 183862,
+    "valid_auc": 0.8402658899526942,
+    "tuning_half_auc": 0.8386519631692807,
+    "other_half_auc": 0.8419393829576038,
+    "members": [
+      {
+        "run": "trees_known_20261106_182211_292567",
+        "weight": 0.1875
+      },
+      {
+        "run": "trees_known_20261106_181322_227396",
+        "weight": 0.1875
+      },
+      {
+        "run": "trees_known_20261106_182103_564795",
+        "weight": 0.1875
+      },
+      {
+        "run": "trees_known_20261106_181821_735949",
+        "weight": 0.1875
+      },
+      {
+        "run": "trees_known_20261106_181600_715761",
+        "weight": 0.25
+      }
+    ],
+    "mo_system_test": {
+      "test_number": 3,
+      "displayed_auc": 0.858,
+      "runtime_seconds": 4
+    }
+  }
+}
