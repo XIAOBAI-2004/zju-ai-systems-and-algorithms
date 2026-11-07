@@ -1,0 +1,86 @@
+{
+  "mix_weights": [
+    0.1875,
+    0.1875,
+    0.1875,
+    0.1875,
+    0.25
+  ],
+  "models": [
+    {
+      "engine": "lightgbm",
+      "seed": 937,
+      "negative_ratio": 24,
+      "depth": 7,
+      "iterations": 455,
+      "use_labels": true,
+      "detailed_events": true,
+      "use_peers": true,
+      "two_hop": true,
+      "use_cohorts": true,
+      "typed_labels": false,
+      "granular": false,
+      "profiles": false
+    },
+    {
+      "engine": "lightgbm",
+      "seed": 123,
+      "negative_ratio": 85,
+      "depth": 8,
+      "iterations": 466,
+      "use_labels": true,
+      "detailed_events": true,
+      "use_peers": true,
+      "two_hop": true,
+      "use_cohorts": true,
+      "typed_labels": false,
+      "granular": false,
+      "profiles": false
+    },
+    {
+      "engine": "lightgbm",
+      "seed": 123,
+      "negative_ratio": 85,
+      "depth": 8,
+      "iterations": 418,
+      "use_labels": true,
+      "detailed_events": true,
+      "use_peers": true,
+      "two_hop": true,
+      "use_cohorts": true,
+      "typed_labels": false,
+      "granular": false,
+      "profiles": true
+    },
+    {
+      "engine": "lightgbm",
+      "seed": 409,
+      "negative_ratio": 85,
+      "depth": 9,
+      "iterations": 417,
+      "use_labels": true,
+      "detailed_events": true,
+      "use_peers": true,
+      "two_hop": true,
+      "use_cohorts": true,
+      "typed_labels": true,
+      "granular": true,
+      "profiles": false
+    },
+    {
+      "engine": "catboost",
+      "seed": 197,
+      "negative_ratio": 40,
+      "depth": 8,
+      "iterations": 722,
+      "use_labels": true,
+      "detailed_events": true,
+      "use_peers": true,
+      "two_hop": true,
+      "use_cohorts": true,
+      "typed_labels": true,
+      "granular": false,
+      "profiles": false
+    }
+  ]
+}
